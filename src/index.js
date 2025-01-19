@@ -1,10 +1,13 @@
+// Подключение зависимостей
+const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const TelegramBot = require("node-telegram-bot-api");
-const { BOT_TOKEN, TARGET_URL } = require("./utils/config");
 const puppeteer = require("puppeteer");
+const { BOT_TOKEN, TARGET_URL } = require("./utils/config");
 
 // Константы
 const TELEGRAM_BOT_TOKEN = BOT_TOKEN;
+const PORT = 3000;
 
 // Инициализация базы данных
 const db = new sqlite3.Database("./prices.db", (err) => {
@@ -175,8 +178,6 @@ function checkAndUpdatePricesForUser(userId, chatId, newPrices) {
         return;
       }
 
-      console.log("Row", row, "newPrice", newPrices);
-
       const dataChanged =
         !row ||
         Number(row.minPrice) !== Number(newPrices.minPrice) ||
@@ -226,8 +227,43 @@ async function processUsers() {
   });
 }
 
-
 setInterval(processUsers, 60000);
 processUsers();
 
+// Создание сервера Express
+const app = express();
 
+// Middleware для обработки JSON
+app.use(express.json());
+
+// Маршрут для проверки состояния сервера
+app.get("/status", (req, res) => {
+  res.json({ status: "Сервер работает", timestamp: new Date() });
+});
+
+// Маршрут для получения списка пользователей
+app.get("/users", (req, res) => {
+  db.all("SELECT * FROM users", (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: "Ошибка при извлечении пользователей" });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// Маршрут для получения данных цен
+app.get("/prices", (req, res) => {
+  db.all("SELECT * FROM prices ORDER BY lastUpdated DESC", (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: "Ошибка при извлечении данных цен" });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// Запуск сервера
+app.listen(PORT, () => {
+  console.log(`Сервер запущен на порте ${PORT}`);
+});
