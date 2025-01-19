@@ -3,12 +3,12 @@ const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const TelegramBot = require("node-telegram-bot-api");
 const puppeteer = require("puppeteer");
-const { BOT_TOKEN, TARGET_URL } = require("./utils/config");
+const { BOT_TOKEN, TARGET_URL, APP_URL } = require("./utils/config");
 
 // Константы
 const TELEGRAM_BOT_TOKEN = BOT_TOKEN;
 const PORT = 3000;
-const URL = process.env.APP_URL || "https://your-deployment-url.com";
+const URL = APP_URL || "https://your-deployment-url.com";
 
 // Инициализация базы данных
 const db = new sqlite3.Database("./prices.db", (err) => {
