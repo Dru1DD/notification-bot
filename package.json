@@ -1,0 +1,23 @@
+{
+  "name": "notification-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "node scripts/clean.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@9.12.1",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "node-telegram-bot-api": "^0.66.0",
+    "nodemon": "^3.1.7",
+    "puppeteer": "^24.1.0",
+    "sqlite3": "^5.1.7"
+  }
+}
