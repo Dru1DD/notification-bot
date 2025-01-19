@@ -8,6 +8,7 @@ const { BOT_TOKEN, TARGET_URL } = require("./utils/config");
 // Константы
 const TELEGRAM_BOT_TOKEN = BOT_TOKEN;
 const PORT = 3000;
+const URL = process.env.APP_URL || "https://your-deployment-url.com";
 
 // Инициализация базы данных
 const db = new sqlite3.Database("./prices.db", (err) => {
@@ -30,7 +31,8 @@ db.run(`CREATE TABLE IF NOT EXISTS prices (
   );`);
 
 // Инициализация Telegram-бота
-const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
+const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { webHook: true });
+bot.setWebHook(`${URL}/bot${TELEGRAM_BOT_TOKEN}`);
 
 // Регистрация пользователей
 bot.onText(/\/start/, (msg) => {
@@ -235,6 +237,11 @@ const app = express();
 
 // Middleware для обработки JSON
 app.use(express.json());
+
+app.post(`/bot${TELEGRAM_BOT_TOKEN}`, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
 
 // Маршрут для проверки состояния сервера
 app.get("/status", (req, res) => {
